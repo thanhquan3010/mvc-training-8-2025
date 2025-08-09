@@ -3,9 +3,12 @@ package com.thanhquan.laptopshop.service;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.stereotype.Service;
+
 import com.thanhquan.laptopshop.domain.User;
 import com.thanhquan.laptopshop.repository.UserRepository;
 
+@Service
 public class UserService {
     final private UserRepository userRepository;
 
