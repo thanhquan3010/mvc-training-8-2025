@@ -31,19 +31,37 @@ public class UserController {
         return "admin/user";
     }
 
-    //detail User 
+    // detail User
     @GetMapping("/admin/user/{id}")
     public String getDetailUser(@PathVariable Long id) {
         System.out.println("id" + id);
         return "home";
     }
 
-    //update user
+    // update user
     public String getUpdateUser(Model model, @PathVariable Long id) {
         var currentUser = this.userService.findUserById(id);
         model.addAttribute("updatedUser", currentUser);
         System.out.println(id);
         return "admin/user/update";
+    }
+
+    public String updateUser(Model model, @ModelAttribute User updatedUser) {
+        var dbUserOptional = this.userService.findUserById(updatedUser.getId());
+        // thực chất dbUserOptional là Optional<User> nên là khai báo var
+        // 1 hộp Optional có thể chứa User hoặc không chứa
+
+        // dùng isPresent thay vì isEmpty vì trả về Optional<User>, chứ không phải trực
+        // tiếp là User.
+        if (dbUserOptional.isPresent()) {
+            var dbUser = dbUserOptional.get();
+            dbUser.setAddress(updatedUser.getAddress());
+            dbUser.setPhone(updatedUser.getPhone());
+            dbUser.setFullName(updatedUser.getFullName());
+
+            this.userService.handleSaveUser(dbUser);
+        }
+        return "redirect:/admin/user";
     }
 
     // Create User
@@ -59,6 +77,12 @@ public class UserController {
         return "redirect:/admin/user";
     }
 
-    //delete user
-
+    // delete user
+    @GetMapping("/admin/user/delete/{id}")
+    public String deleteUser(@PathVariable Long id) {
+        this.userService.findUserById(id).ifPresent(user -> {
+            this.userService.deleteUser(user);
+        });
+        return "redirect:/admin/user";
+    }
 }
